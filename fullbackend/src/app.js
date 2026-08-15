@@ -3,6 +3,7 @@
 
 
 const express = require('express');
+const { dlopen } = require('node:process');
 const app = express();
 
 app.use(express.json()); // ye middleware hote hai jo ki request body ko json format me convert kar deta hai.
@@ -43,30 +44,45 @@ app.post('/notes',(req,res)=>{
     
 })// we created the API named /notes and rhe method used int he POST method
 
+// GET endpoint to fetch all notes
 app.get('/notes',(req,res)=>{
+    // Sends a 200 OK status with the array of notes
     res.status(200).json(
         {
-            message : "notes fetshed successfully",
+            message : "notes fetched successfully",
             notes : notes
         }
     )
 })
 
+// DELETE endpoint to remove a note by its index in the array
 app.delete('/notes/:index',(req,res)=>{
+    // Extract index from request parameters
     const index = req.params.index;
+    
+    // Delete the note at the given index
     delete notes[index]
+    
+    // Send success response
     res.status(200).json({
         message : "note deleted successfully"
     })
 })
 
+// PATCH endpoint to partially update a note's description
 app.patch('/notes/:index',(req,res)=>{
+    // Extract index from request parameters
     const index = req.params.index;
-    // Add logic to update the note at the specified index
+    
+    // Extract new description from request body
     const description = req.body.description;
+    
+    // Update the note's description if provided
     if (description) {
         notes[index].description = description;
     }
+    
+    // Send success response
     res.status(200).json({
         message : "note updated successfully"
     })
