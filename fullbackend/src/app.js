@@ -58,34 +58,45 @@ app.get('/notes',(req,res)=>{
 // DELETE endpoint to remove a note by its index in the array
 app.delete('/notes/:index',(req,res)=>{
     // Extract index from request parameters
-    const index = req.params.index;
+    const index = parseInt(req.params.index, 10);
     
-    // Delete the note at the given index
-    delete notes[index]
-    
-    // Send success response
-    res.status(200).json({
-        message : "note deleted successfully"
-    })
+    // Delete the note at the given index using splice
+    if (index >= 0 && index < notes.length) {
+        notes.splice(index, 1);
+        res.status(200).json({
+            message : "note deleted successfully"
+        });
+    } else {
+        res.status(404).json({
+            message : "note not found"
+        });
+    }
 })
 
 // PATCH endpoint to partially update a note's description
 app.patch('/notes/:index',(req,res)=>{
     // Extract index from request parameters
-    const index = req.params.index;
+    const index = parseInt(req.params.index, 10);
     
     // Extract new description from request body
     const description = req.body.description;
     
-    // Update the note's description if provided
-    if (description) {
-        notes[index].description = description;
+    if (index >= 0 && index < notes.length) {
+        // Update the note's description if provided
+        if (description) {
+            notes[index].description = description;
+        }
+        
+        // Send success response
+        res.status(200).json({
+            message : "note updated successfully",
+            note : notes[index]
+        });
+    } else {
+        res.status(404).json({
+            message : "note not found"
+        });
     }
-    
-    // Send success response
-    res.status(200).json({
-        message : "note updated successfully"
-    })
 })
 
 
