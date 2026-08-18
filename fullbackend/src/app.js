@@ -3,7 +3,6 @@
 
 
 const express = require('express');
-const { dlopen } = require('node:process');
 const app = express();
 
 app.use(express.json()); // ye middleware hote hai jo ki request body ko json format me convert kar deta hai.
@@ -35,6 +34,10 @@ const notes = []
 app.post('/notes',(req,res)=>{
     //we will get the title and the description from the request body
     //console.log(req.body)
+
+    if (!req.body.title || !req.body.description) {
+        return res.status(400).json({ message: "Title and description are required" });
+    }
 
     notes.push(req.body) // we will push the note to the array
     res.status(201).json(
@@ -73,16 +76,19 @@ app.delete('/notes/:index',(req,res)=>{
     }
 })
 
-// PATCH endpoint to partially update a note's description
+// PATCH endpoint to partially update a note's description or title
 app.patch('/notes/:index',(req,res)=>{
     // Extract index from request parameters
     const index = parseInt(req.params.index, 10);
     
-    // Extract new description from request body
-    const description = req.body.description;
+    // Extract new fields from request body
+    const { title, description } = req.body;
     
     if (index >= 0 && index < notes.length) {
-        // Update the note's description if provided
+        // Update the note's fields if provided
+        if (title) {
+            notes[index].title = title;
+        }
         if (description) {
             notes[index].description = description;
         }
